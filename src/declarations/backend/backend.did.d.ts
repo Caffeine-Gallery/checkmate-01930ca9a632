@@ -11,6 +11,7 @@ export interface _SERVICE {
   'addItem' : ActorMethod<[string], ShoppingItem>,
   'deleteItem' : ActorMethod<[bigint], boolean>,
   'getItems' : ActorMethod<[], Array<ShoppingItem>>,
+  'getSuggestions' : ActorMethod<[string], Array<string>>,
   'toggleItem' : ActorMethod<[bigint], [] | [ShoppingItem]>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;

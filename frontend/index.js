@@ -4,13 +4,12 @@ const form = document.getElementById('add-item-form');
 const input = document.getElementById('new-item');
 const list = document.getElementById('shopping-list');
 const loading = document.getElementById('loading');
+const suggestionsDiv = document.getElementById('suggestions');
 
-// Show/hide loading spinner
 const toggleLoading = (show) => {
     loading.classList.toggle('d-none', !show);
 };
 
-// Render all items
 const renderItems = async () => {
     toggleLoading(true);
     try {
@@ -37,7 +36,41 @@ const renderItems = async () => {
     }
 };
 
-// Add new item
+let suggestionTimeout;
+const updateSuggestions = async () => {
+    const inputText = input.value.trim();
+    try {
+        const suggestions = await backend.getSuggestions(inputText);
+        if (suggestions.length > 0) {
+            suggestionsDiv.innerHTML = `
+                <div class="suggestions-container">
+                    ${suggestions.map(suggestion => `
+                        <button class="btn btn-outline-secondary btn-sm me-2 mb-2 suggestion-btn" 
+                                onclick="window.useSuggestion('${suggestion}')">
+                            ${suggestion}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            suggestionsDiv.innerHTML = '';
+        }
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+    }
+};
+
+input.addEventListener('input', () => {
+    clearTimeout(suggestionTimeout);
+    suggestionTimeout = setTimeout(updateSuggestions, 300);
+});
+
+window.useSuggestion = (text) => {
+    input.value = text;
+    suggestionsDiv.innerHTML = '';
+    input.focus();
+};
+
 form.onsubmit = async (e) => {
     e.preventDefault();
     const text = input.value.trim();
@@ -47,6 +80,7 @@ form.onsubmit = async (e) => {
     try {
         await backend.addItem(text);
         input.value = '';
+        suggestionsDiv.innerHTML = '';
         await renderItems();
     } catch (error) {
         console.error('Error adding item:', error);
@@ -55,7 +89,6 @@ form.onsubmit = async (e) => {
     }
 };
 
-// Toggle item completion
 window.toggleItem = async (id) => {
     toggleLoading(true);
     try {
@@ -68,7 +101,6 @@ window.toggleItem = async (id) => {
     }
 };
 
-// Delete item
 window.deleteItem = async (id) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
     
@@ -83,5 +115,4 @@ window.deleteItem = async (id) => {
     }
 };
 
-// Initial render
 renderItems();

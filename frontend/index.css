@@ -45,3 +45,15 @@ body {
     height: 3rem;
     margin: 2rem 0;
 }
+
+.suggestions-container {
+    padding: 0.5rem 0;
+}
+
+.suggestion-btn {
+    transition: all 0.2s ease;
+}
+
+.suggestion-btn:hover {
+    transform: scale(1.05);
+}
