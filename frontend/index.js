@@ -37,8 +37,7 @@ const renderItems = async () => {
 };
 
 let suggestionTimeout;
-const updateSuggestions = async () => {
-    const inputText = input.value.trim();
+const updateSuggestions = async (inputText = '') => {
     try {
         const suggestions = await backend.getSuggestions(inputText);
         if (suggestions.length > 0) {
@@ -57,12 +56,17 @@ const updateSuggestions = async () => {
         }
     } catch (error) {
         console.error('Error fetching suggestions:', error);
+        suggestionsDiv.innerHTML = '';
     }
 };
 
-input.addEventListener('input', () => {
+const debouncedUpdateSuggestions = (inputText) => {
     clearTimeout(suggestionTimeout);
-    suggestionTimeout = setTimeout(updateSuggestions, 300);
+    suggestionTimeout = setTimeout(() => updateSuggestions(inputText), 300);
+};
+
+input.addEventListener('input', (e) => {
+    debouncedUpdateSuggestions(e.target.value.trim());
 });
 
 window.useSuggestion = (text) => {
@@ -79,9 +83,10 @@ form.onsubmit = async (e) => {
     toggleLoading(true);
     try {
         await backend.addItem(text);
-        input.value = '';
-        suggestionsDiv.innerHTML = '';
         await renderItems();
+        input.value = '';
+        // Update suggestions immediately after adding item
+        await updateSuggestions('');
     } catch (error) {
         console.error('Error adding item:', error);
     } finally {
@@ -108,6 +113,8 @@ window.deleteItem = async (id) => {
     try {
         await backend.deleteItem(id);
         await renderItems();
+        // Update suggestions after deleting item
+        await updateSuggestions(input.value.trim());
     } catch (error) {
         console.error('Error deleting item:', error);
     } finally {
@@ -115,4 +122,8 @@ window.deleteItem = async (id) => {
     }
 };
 
-renderItems();
+// Initialize
+(async () => {
+    await renderItems();
+    await updateSuggestions('');
+})();
