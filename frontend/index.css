@@ -1,3 +1,11 @@
+body {
+    background-color: #f3e5f5;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 .completed .item-text {
     text-decoration: line-through;
     color: #6c757d;
