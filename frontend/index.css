@@ -1,10 +1,15 @@
 body {
-    background-color: #f3e5f5;
+    background-color: #4a148c;
     font-family: "Comic Sans MS", "Comic Sans", cursive;
 }
 
 .card {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    background-color: white;
+}
+
+.card-header {
+    border-bottom: none;
 }
 
 .completed .item-text {
